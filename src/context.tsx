@@ -52,3 +52,48 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
 export function useAppContext() {
   return useContext(AppContext);
 }
+// import { createContext, useContext, useState } from 'react';
+// import { Driver } from './types';
+
+// interface Student {
+//   name: string;
+//   className: string;
+//   schoolLocation: string;
+// }
+
+// interface Route {
+//   pickup: string;
+//   school: string;
+//   dropoff: string;
+// }
+
+// interface AppContextType {
+//   student: Student | null;
+//   setStudent: (student: Student | null) => void;
+//   route: Route | null;
+//   setRoute: (route: Route | null) => void;
+//   selectedDriver: Driver | null;
+//   setSelectedDriver: (driver: Driver | null) => void;
+// }
+
+// const AppContext = createContext<AppContextType | undefined>(undefined);
+
+// export function AppContextProvider({ children }: { children: React.ReactNode }) {
+//   const [student, setStudent] = useState<Student | null>(null);
+//   const [route, setRoute] = useState<Route | null>(null);
+//   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
+
+//   return (
+//     <AppContext.Provider value={{ student, setStudent, route, setRoute, selectedDriver, setSelectedDriver }}>
+//       {children}
+//     </AppContext.Provider>
+//   );
+// }
+
+// export function useAppContext() {
+//   const context = useContext(AppContext);
+//   if (!context) {
+//     throw new Error('useAppContext must be used within an AppContextProvider');
+//   }
+//   return context;
+// }

@@ -1,12 +1,10 @@
-import { Button, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { Text, View } from 'react-native';
+import { styles } from '../src/styles';
 
-export default function NotFound() {
-  const router = useRouter();
+export default function NotFoundScreen() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Page Not Found</Text>
-      <Button onPress={() => router.replace('/')} title="Go Home" />
+    <View style={styles.notFoundContainer}>
+      <Text style={styles.text}>This screen doesn't exist.</Text>
     </View>
   );
 }

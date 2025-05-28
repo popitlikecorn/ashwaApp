@@ -1,8 +1,9 @@
 {
   "expo": {
-    "name": "SchoolTransportApp",
-    "slug": "SchoolTransportApp",
+    "name": "SchoolTransportAppNewTechFoundation",
+    "slug": "schooltransportappnew",
     "version": "1.0.0",
+    "scheme": "schooltransportapp",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -19,23 +20,10 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.anonymous.SchoolTransportApp"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "experiments": {
-      "typedRoutes": false
-    },
-    "newArchEnabled": true,
-    "plugins": [
-      [
-        "expo-router",
-        {
-          "origin": "http://localhost:8081"
-        }
-      ]
-    ]
+    }
   }
 }
