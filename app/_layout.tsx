@@ -1,44 +1,26 @@
-// import { Stack } from 'expo-router';
-// import { SafeAreaProvider } from 'react-native-safe-area-context';
-// import { PaperProvider, MD3LightTheme } from 'react-native-paper';
-// import { View, Text } from 'react-native';
-// import { colors, styles } from '../src/styles';
-
-// const theme = {
-//   ...MD3LightTheme,
-//   colors: {
-//     ...MD3LightTheme.colors,
-//     primary: colors.primary,
-//     secondary: colors.secondary,
-//     background: colors.background,
-//   },
-// };
-
-// export default function RootLayout() {
-//   return (
-//     <SafeAreaProvider>
-//       <PaperProvider theme={theme}>
-//         <View style={styles.header}>
-//           <Text style={styles.headerText}>School Transport App</Text>
-//         </View>
-//         <Stack initialRouteName='(tabs)'>
-//           <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-//           <Stack.Screen name='confirmation' options={{ headerShown: false }} />
-//         </Stack>
-//       </PaperProvider>
-//     </SafeAreaProvider>
-//   );
-// }
 import { Stack } from 'expo-router';
+   import { AppContextProvider } from '../src/context';
+   import { useFonts } from 'expo-font';
 
-export default function Layout() {
-  return (
-    <Stack>
-      {/* The Tabs navigator as a screen */}
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      
-      {/* Other stack screens */}
-      <Stack.Screen name="confirmation" options={{ title: 'Confirmation' }} />
-    </Stack>
+   export default function RootLayout() {
+     const [fontsLoaded] = useFonts({
+       SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+     });
+
+     if (!fontsLoaded) {
+       return null;
+     }
+
+   return (
+    <AppContextProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="Signup" />
+        <Stack.Screen name="AddNewStudent" />
+        <Stack.Screen name="RouteSelection" />
+        <Stack.Screen name="SelectTripDetails" />
+        <Stack.Screen name="Confirmation" />
+      </Stack>
+    </AppContextProvider>
   );
 }
