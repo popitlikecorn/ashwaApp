@@ -26,5 +26,5 @@ export default function Index() {
   }, [guardian, isNavigated, router]); // Added router
 
   // Return a simple view while navigation is happening
-  return <View style={styles.inputContainer} />;
+  return <View style={styles.container} />;
 }

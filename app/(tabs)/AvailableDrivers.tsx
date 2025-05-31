@@ -1,279 +1,140 @@
-import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAppContext, Driver } from '../../src/context';
-import { styles } from '../../src/styles';
+import { useAppContext, type Driver } from '../../src/context';
+import { styles as sharedStyles, colors } from '../../src/styles';
+import { Ionicons } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
 
 export default function AvailableDriversScreen() {
-  const { selectedRoute, setSelectedDriver } = useAppContext();
+  const { locations, setSelectedDriver } = useAppContext();
   const router = useRouter();
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+
+  // Mock driver data with ratings
   const allDrivers: Driver[] = [
-    { name: 'Raj Kumar', fee: 2500, pickupTime: '8:20 AM', dropoffTime: '3:00 PM', routeId: '1' },
-    { name: 'Anil Sharma', fee: 2800, pickupTime: '8:30 AM', dropoffTime: '3:10 PM', routeId: '2' },
-    { name: 'Vikram Singh', fee: 2300, pickupTime: '8:15 AM', dropoffTime: '3:05 PM', routeId: '3' },
+    {
+      id: '1',
+      name: 'Raj Kumar',
+      fee: 2500,
+      pickupTime: '8:20 AM',
+      dropoffTime: '3:00 PM',
+      rating: 4.5,
+      availableLocations: ['Model Town', 'Civil Lines'],
+    },
+    {
+      id: '2',
+      name: 'Anil Sharma',
+      fee: 2800,
+      pickupTime: '8:30 AM',
+      dropoffTime: '3:10 PM',
+      rating: 4.2,
+      availableLocations: ['Lajpat Nagar', 'Saket'],
+    },
+    {
+      id: '3',
+      name: 'Vikram Singh',
+      fee: 2300,
+      pickupTime: '8:15 AM',
+      dropoffTime: '3:05 PM',
+      rating: 4.8,
+      availableLocations: ['Mayur Vihar', 'Laxmi Nagar'],
+    },
   ];
 
-  const drivers = allDrivers.filter((driver) => driver.routeId === selectedRoute?.id);
+  useEffect(() => {
+    if (!locations?.pickup || !locations?.dropoff) {
+      Alert.alert('Error', 'No locations selected');
+      router.replace('RouteSelection');
+      return;
+    }
+    // Backend placeholder: Fetch drivers based on locations
+    // fetch('https://api.example.com/drivers', {
+    //   method: 'POST',
+    //   body: JSON.stringify({ pickup: locations.pickup, dropoff: locations.dropoff, school: locations.school }),
+    // }).then(res => res.json()).then(data => setDrivers(data));
+    
+    // Mock filtering based on locations
+    const filteredDrivers = allDrivers.filter(
+      (driver) =>
+        driver.availableLocations?.some((loc) => locations.pickup.includes(loc)) ||
+        driver.availableLocations?.some((loc) => locations.dropoff.includes(loc))
+    );
+    setDrivers(filteredDrivers);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locations, router]);
 
   const handleSelectDriver = (driver: Driver) => {
     setSelectedDriver(driver);
-    router.replace('SelectTripDetails');
+    router.replace('SelectedTripDetails');
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      <Text style={styles.title}>Available Drivers</Text>
+    <View style={[sharedStyles.container, localStyles.container]}>
+      <View style={localStyles.header}>
+        <Ionicons name="car-outline" size={64} color={colors.primary} />
+        <Text style={sharedStyles.textContent}>Drivers</Text>
+      </View>
       {drivers.length === 0 ? (
-        <Text style={styles.errorText}>No drivers available for this route</Text>
+        <Text style={localStyles.errorText}>No drivers available</Text>
       ) : (
-        drivers.map((driver, index) => (
-          <TouchableOpacity key={index} style={styles.card} onPress={() => handleSelectDriver(driver)}>
-            <View style={styles.driverHeader}>
-              <Text style={styles.driverName}>{driver.name}</Text>
-              <Text style={styles.detail}>₹{driver.fee}/month</Text>
+        drivers.map((driver) => (
+          <TouchableOpacity
+            key={driver.id}
+            style={sharedStyles.card}
+            onPress={() => handleSelectDriver(driver)}
+          >
+            <View style={localStyles.driverHeader}>
+              <Text style={sharedStyles.driverName}>{driver.name}</Text>
+              <Ionicons name="chevron-forward-outline" size={20} color={colors.secondary} />
             </View>
-            <Text style={styles.detail}>Pickup: {driver.pickupTime}</Text>
-            <Text style={styles.detail}>Drop-off: {driver.dropoffTime}</Text>
+            <View style={localStyles.detailRow}>
+              <Ionicons name="time-outline" size={16} color={colors.primary} />
+              <Text style={[sharedStyles.detail, { color: colors.primary }]}>
+                Pickup: {driver.pickupTime}
+              </Text>
+            </View>
+            <View style={localStyles.detailRow}>
+              <Ionicons name="time-outline" size={16} color={colors.primary} />
+              <Text style={[sharedStyles.detail, { color: colors.primary }]}>
+                Drop-off: {driver.dropoffTime}
+              </Text>
+            </View>
+            <View style={localStyles.detailRow}>
+              <Ionicons name="star-outline" size={16} color={colors.secondary} />
+              <Text style={sharedStyles.detail}>Rating: {driver.rating}/5</Text>
+            </View>
+            <Text style={sharedStyles.detail}>₹{driver.fee}/month</Text>
           </TouchableOpacity>
         ))
       )}
-    </ScrollView>
+    </View>
   );
 }
-// import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
-// import { useRouter } from 'expo-router';
-// import { useAppContext } from '../../src/context';
-// import React, { useState } from 'react';
-// import { styles } from '../../src/styles';
 
-// interface Driver {
-//   id: string;
-//   name: string;
-//   fee: number;
-//   pickupTime: string;
-//   dropoffTime: string;
-//   rating?: number;
-//   experience?: string;
-// }
-
-// export default function BookingScreen() {
-//   const { setSelectedDriver } = useAppContext();
-//   const router = useRouter();
-//   const [isLoading, setIsLoading] = useState(false);
-
-//   // Mock data with expanded driver information
-//   const drivers: Driver[] = [
-//     { 
-//       id: '1',
-//       name: 'Raj Kumar',
-//       fee: 5000,
-//       pickupTime: '8:20 AM',
-//       dropoffTime: '3:00 PM',
-//       rating: 4.8,
-//       experience: '5 years'
-//     },
-//     { 
-//       id: '2',
-//       name: 'Anita Sharma',
-//       fee: 4500,
-//       pickupTime: '8:30 AM',
-//       dropoffTime: '3:15 PM',
-//       rating: 4.9,
-//       experience: '7 years'
-//     },
-//     { 
-//       id: '3',
-//       name: 'Vikram Singh',
-//       fee: 5200,
-//       pickupTime: '8:15 AM',
-//       dropoffTime: '2:45 PM',
-//       rating: 4.7,
-//       experience: '4 years'
-//     },
-//   ];
-
-//   const handleSelectDriver = async (driver: Driver) => {
-//     try {
-//       setIsLoading(true);
-//       setSelectedDriver(driver);
-//       await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
-//       router.replace('/confirmation'); // Fixed from '/(tabs)'
-//     } catch (error) {
-//       console.error('Error booking driver:', error);
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   const renderDriverCard = (driver: Driver) => (
-//     <View key={driver.id} style={styles.card}>
-//       <View style={styles.driverHeader}>
-//         <Text style={styles.driverName}>{driver.name}</Text>
-//         <View style={styles.row}>
-//           {driver.rating && (
-//             <Text style={styles.badge}>⭐ {driver.rating}</Text>
-//           )}
-//           <Text style={styles.badge}>Verified</Text>
-//         </View>
-//       </View>
-      
-//       <View style={styles.detailsContainer}>
-//         <Text style={styles.detail}>Monthly Fee: ₹{driver.fee}</Text>
-//         <Text style={styles.detail}>Pickup: {driver.pickupTime}</Text>
-//         <Text style={styles.detail}>Drop-off: {driver.dropoffTime}</Text>
-//         {driver.experience && (
-//           <Text style={styles.detail}>Experience: {driver.experience}</Text>
-//         )}
-//       </View>
-      
-//       <TouchableOpacity 
-//         style={[styles.button, isLoading && styles.fadedButton]} 
-//         onPress={() => handleSelectDriver(driver)}
-//         disabled={isLoading}
-//       >
-//         {isLoading ? (
-//           <ActivityIndicator color="#FFFFFF" />
-//         ) : (
-//           <Text style={styles.buttonText}>Book Now</Text>
-//         )}
-//       </TouchableOpacity>
-//     </View>
-//   );
-
-//   return (
-//     <ScrollView 
-//       contentContainerStyle={styles.scrollContent}
-//       showsVerticalScrollIndicator={false}
-//     >
-//       <Text style={styles.title}>Available Drivers</Text>
-//       {drivers.map(renderDriverCard)}
-//     </ScrollView>
-//   );
-// }
-
-// // import { View, Text, TouchableOpacity } from 'react-native';
-// // import { useRouter } from 'expo-router';
-// // import { useAppContext } from '../../src/context';
-// // import React from 'react';
-// // import { styles } from '../../src/styles';
-
-// // // Driver type for type safety
-// // interface Driver {
-// //   name: string;
-// //   fee: number;
-// //   pickupTime: string;
-// //   dropoffTime: string;
-// // }
-
-// // // Booking screen: select driver and confirm
-// // export default function BookingScreen() {
-// //   const { setSelectedDriver } = useAppContext();
-// //   const router = useRouter();
-
-// //   // Hardcoded driver data
-// //   const drivers: Driver[] = [
-// //     { name: 'Raj Kumar', fee: 5000, pickupTime: '8:20 AM', dropoffTime: '3:00 PM' },
-// //     { name: 'Anita Sharma', fee: 4500, pickupTime: '8:30 AM', dropoffTime: '3:15 PM' },
-// //   ];
-
-// //   // Select driver and proceed to confirmation
-// //   const handleSelectDriver = (driver: Driver) => {
-// //     setSelectedDriver(driver);
-// //     router.push('/confirmation');
-// //   };
-
-// //   return (
-// //     <View style={styles.container}>
-// //       <Text style={styles.title}>Book Driver</Text>
-// //       {drivers.map((driver, index) => (
-// //         <View key={index} style={styles.card}>
-// //           <Text style={styles.badge}>Verified Driver</Text>
-// //           <Text style={styles.detail}>Name: {driver.name}</Text>
-// //           <Text style={styles.detail}>Fee: ₹{driver.fee}/month</Text>
-// //           <Text style={styles.detail}>Pickup: {driver.pickupTime}</Text>
-// //           <Text style={styles.detail}>Drop-off: {driver.dropoffTime}</Text>
-// //           <TouchableOpacity style={styles.button} onPress={() => handleSelectDriver(driver)}>
-// //             <Text style={styles.buttonText}>Select</Text>
-// //           </TouchableOpacity>
-// //         </View>
-// //       ))}
-// //     </View>
-// //   );
-// // }
-// // // import { View, Text } from 'react-native';
-// // // import { Card, Button } from 'react-native-paper';
-// // // import { Bell } from 'lucide-react-native';
-// // // import { useState } from 'react';
-// // // import { useRouter } from 'expo-router';
-// // // import { useAppContext } from '../../src/context';
-// // // import { styles, colors } from '../../src/styles';
-
-// // // export default function BookingScreen() {
-// // //   const { selectedDriver } = useAppContext();
-// // //   const router = useRouter();
-// // //   const [bookingConfirmed, setBookingConfirmed] = useState(false);
-
-// // //   const handleConfirm = () => {
-// // //     console.log('Booking confirmed with driver:', selectedDriver);
-// // //     setBookingConfirmed(true);
-// // //     setTimeout(() => {
-// // //       setBookingConfirmed(false);
-// // //       router.push('/confirmation');
-// // //     }, 2000);
-// // //   };
-
-// // //   return (
-// // //     <View style={styles.container}>
-// // //       <View style={styles.row}>
-// // //         <Bell size={20} color={colors.text} style={styles.icon} />
-// // //         <Text style={styles.text}>Booking Confirmation</Text>
-// // //       </View>
-// // //       {bookingConfirmed ? (
-// // //         <View style={[styles.card, styles.border]}>
-// // //           <Text style={[styles.text, styles.boldText, styles.fontSize16, styles.marginBottom8, { color: colors.primary }]}>Booking Confirmed!</Text>
-// // //           <Text style={[styles.text, styles.smallText]}>
-// // //             Your booking has been confirmed with {selectedDriver?.name || 'Raj Kumar'}
-// // //           </Text>
-// // //         </View>
-// // //       ) : (
-// // //         <Card style={styles.card}>
-// // //           <Card.Content>
-// // //             <Text style={[styles.text, styles.title]}>{selectedDriver?.name || 'Raj Kumar'}</Text>
-// // //             <Text style={[styles.text, { color: colors.secondary }]}>{selectedDriver?.route || 'North Delhi to DPS'}</Text>
-// // //             <View style={styles.rowSpaceBetween}>
-// // //               <Text style={[styles.text, { color: colors.secondary }]}>Seats Available</Text>
-// // //               <Text style={[styles.text, styles.boldText]}>{selectedDriver?.seats || '3'}</Text>
-// // //             </View>
-// // //             <View style={styles.rowSpaceBetween}>
-// // //               <Text style={[styles.text, { color: colors.secondary }]}>Distance</Text>
-// // //               <Text style={[styles.text, styles.boldText]}>{selectedDriver?.distance || 3.2} km</Text>
-// // //             </View>
-// // //             <View style={styles.rowSpaceBetween}>
-// // //               <Text style={[styles.text, { color: colors.secondary }]}>Monthly Fee</Text>
-// // //               <Text style={[styles.text, styles.boldText, { color: colors.primary }]}>₹{selectedDriver?.fee || 5000}</Text>
-// // //             </View>
-// // //             <View style={styles.rowSpaceBetween}>
-// // //               <Text style={[styles.text, { color: colors.secondary }]}>Pickup Time</Text>
-// // //               <Text style={[styles.text, styles.boldText, { color: colors.primary }]}>{selectedDriver?.pickupTime || '8:20 AM'}</Text>
-// // //             </View>
-// // //             <View style={[styles.row, styles.marginTop16]}>
-// // //               <Button
-// // //                 mode='outlined'
-// // //                 onPress={() => router.push('/(tabs)/route')}
-// // //                 style={[styles.button, styles.flex1, styles.marginRight8]}
-// // //               >
-// // //                 Cancel
-// // //               </Button>
-// // //               <Button
-// // //                 mode='contained'
-// // //                 onPress={handleConfirm}
-// // //                 style={[styles.button, styles.flex1]}
-// // //               >
-// // //                 Confirm Booking
-// // //               </Button>
-// // //             </View>
-// // //           </Card.Content>
-// // //         </Card>
-// // //       )}
-// // //     </View>
-// // //   );
-// // // }
+const localStyles = StyleSheet.create({
+  container: {
+    justifyContent: 'center',
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  driverHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#EF4444',
+    textAlign: 'center',
+    marginTop: 16,
+  },
+});
